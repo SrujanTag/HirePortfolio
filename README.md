@@ -9,8 +9,8 @@ Our goal is to design a responsive and visually appealing website that not only 
 
 ## 👥 Team Members
 
-* **Team Leader:** Kartikey Chaudhary
 * **Members:**
+  * Kartikey Chaudhary
   * Srujan Tagalpallewar
   * Palak Dasauni
   * Ayush Bharti
