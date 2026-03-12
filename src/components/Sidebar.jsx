@@ -13,8 +13,8 @@ const Sidebar = ({ isOpen, toggle, activeRole, setActiveRole, searchQuery, setSe
     <aside 
       className={`
         bg-gray-900 border-r border-gray-800 transition-all duration-300 ease-in-out z-40
-        fixed top-16 bottom-0 overflow-y-auto
-        md:relative md:top-0 md:bottom-auto md:h-auto md:overflow-visible
+        fixed top-16 bottom-0 overflow-y-auto overflow-x-hidden
+        md:sticky md:top-16 md:bottom-auto md:h-[calc(100vh-4rem)] md:overflow-y-auto md:overflow-x-hidden
         ${isOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0 md:w-0'}
       `}
     >

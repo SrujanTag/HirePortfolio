@@ -20,10 +20,19 @@ const Footer = () => (
         </div>
         <div>
           <h3 className="text-white text-lg font-bold mb-4">Connect</h3>
-          <div className="flex space-x-4">
-            <Github className="text-gray-400 hover:text-white cursor-pointer" />
-            <Linkedin className="text-gray-400 hover:text-white cursor-pointer" />
-            <ExternalLink className="text-gray-400 hover:text-white cursor-pointer" />
+          <div className="flex space-x-6">
+            <div className="flex flex-col items-center group cursor-pointer">
+              <Github className="text-gray-400 group-hover:text-white mb-1" />
+              <span className="text-xs text-gray-400 group-hover:text-white">GitHub</span>
+            </div>
+            <div className="flex flex-col items-center group cursor-pointer">
+              <Linkedin className="text-gray-400 group-hover:text-white mb-1" />
+              <span className="text-xs text-gray-400 group-hover:text-white">LinkedIn</span>
+            </div>
+            <div className="flex flex-col items-center group cursor-pointer">
+              <ExternalLink className="text-gray-400 group-hover:text-white mb-1" />
+              <span className="text-xs text-gray-400 group-hover:text-white">Portfolio</span>
+            </div>
           </div>
         </div>
       </div>

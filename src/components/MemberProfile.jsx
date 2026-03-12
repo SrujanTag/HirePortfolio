@@ -38,7 +38,7 @@ function MemberProfile({ baseMember, onHire, onBack }) {
            </div>
            
            <h1 className="text-6xl md:text-8xl font-black text-white mb-4 tracking-tight">
-             I'm <span className={`text-transparent bg-clip-text bg-gradient-to-r from-white to-${member.color}-500`}>{firstName}</span>
+             I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-300 to-purple-500">{firstName}</span>
            </h1>
            
            <p className="text-xl md:text-2xl text-gray-400 font-light mb-8 flex items-center justify-center gap-3">
