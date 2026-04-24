@@ -125,13 +125,13 @@ export const getDetailedData = (user) => {
     badges: ["FAST LEARNER", "CLEAN CODE", "GLOBAL MINDSET"],
     availability: {
       status: "Available",
-      timezone: "UTC-7 (PST)",
+      timezone: "IST (UTC+5:30)",
       response: "< 2 Hours"
     },
     arsenal: {
-      frontend: user.skills.frontend || [],
-      backend: user.skills.backend || [],
-      tools: user.skills.tools || []
+      frontend: user.skills?.frontend || [],
+      backend: user.skills?.backend || [],
+      tools: user.skills?.tools || []
     },
     projects: [
       { 
@@ -147,7 +147,7 @@ export const getDetailedData = (user) => {
         image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80" 
       }
     ],
-    education: {
+    education: user.education || {
       school: "Indian Institute of Information Technology",
       degree: "B.Tech Computer Science",
       year: "2025-2029"
@@ -159,9 +159,10 @@ export const getDetailedData = (user) => {
     ]
   };
 
-  if (user.role.includes("Developer")) {
-    defaults.education.school = "Indian Institute of Information Technology";
-    defaults.education.degree = "B.Tech Information Technology";
+  if (user.role && user.role.includes("Developer")) {
+    if (!user.education) {
+      defaults.education.degree = "B.Tech Information Technology";
+    }
     defaults.awards = [{title: "Hackathon Winner", org: "SmartIndia"}, {title: "AWS Certified", org: "Amazon"}];
     defaults.projects[0].title = "E-Commerce Platform";
     defaults.projects[0].tags = ["React", "Node.js"];
