@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { User, Filter, Plus } from './icons';
 import PortfolioCard from './PortfolioCard';
-
 const PortfolioGrid = ({
   users,
   isSidebarOpen,
@@ -22,7 +21,6 @@ const PortfolioGrid = ({
       return matchesRole && matchesSearch;
     });
   }, [users, activeRole, searchQuery]);
-
   return (
     <div className="flex-1 bg-gray-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
@@ -35,9 +33,7 @@ const PortfolioGrid = ({
               Browse through our talented team of developers and designers.
             </p>
           </div>
-
           <div className="flex items-center gap-3">
-            {/* Add Profile button — visible when logged in */}
             {currentUser && (
               <button
                 onClick={onAddProfile}
@@ -47,7 +43,6 @@ const PortfolioGrid = ({
                 Add Your Profile
               </button>
             )}
-
             {!isSidebarOpen && (
               <button
                 onClick={toggleSidebar}
@@ -58,7 +53,6 @@ const PortfolioGrid = ({
             )}
           </div>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
           {filteredMembers.map((member) => (
             <div key={member.id}>
@@ -70,7 +64,6 @@ const PortfolioGrid = ({
               />
             </div>
           ))}
-
           {filteredMembers.length === 0 && (
             <div className="col-span-full text-center py-20 bg-gray-900 rounded-xl border border-gray-800">
               <User size={48} className="mx-auto text-gray-700 mb-4" />
@@ -83,5 +76,4 @@ const PortfolioGrid = ({
     </div>
   );
 };
-
 export default PortfolioGrid;

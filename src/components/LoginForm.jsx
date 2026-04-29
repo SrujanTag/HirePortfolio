@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { auth, provider, signInWithPopup, ADMIN_EMAILS } from '../firebase';
-
-// ── Persistent user store (localStorage) ────────────────────────────────────
 const STORAGE_KEY = 'hp_registered_users';
-
 const getStoredUsers = () => {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -11,21 +8,14 @@ const getStoredUsers = () => {
     return [];
   }
 };
-
 const saveUser = (user) => {
   const existing = getStoredUsers();
   const updated  = [...existing, user];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 };
-
-// ── Seeded admin (never in localStorage) ────────────────────────────────────
 const ADMIN = { email: 'admin@admin.com', password: 'admin', name: 'Admin', role: 'admin' };
-
-// ─────────────────────────────────────────────────────────────────────────────
 const LoginForm = ({ onLogin }) => {
-  const [mode, setMode] = useState('login'); // 'login' | 'signup'
-
-  // shared fields
+  const [mode, setMode] = useState('login'); 
   const [name,            setName]            = useState('');
   const [email,           setEmail]           = useState('');
   const [password,        setPassword]        = useState('');
@@ -33,16 +23,13 @@ const LoginForm = ({ onLogin }) => {
   const [showPassword,    setShowPassword]    = useState(false);
   const [status, setStatus] = useState({ message: '', isError: false });
   const [googleLoading, setGoogleLoading] = useState(false);
-
   const displayStatus = (msg, isError = true) => setStatus({ message: msg, isError });
   const clearStatus   = ()                     => setStatus({ message: '', isError: false });
-
   const switchMode = (m) => {
     setMode(m);
     setName(''); setEmail(''); setPassword(''); setConfirmPassword('');
     clearStatus();
   };
-
   // ── GOOGLE SIGN-IN ────────────────────────────────────────────────────────
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -62,7 +49,6 @@ const LoginForm = ({ onLogin }) => {
       }, 600);
     } catch (err) {
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
-        // user closed the popup — silent fail
       } else if (err.code === 'auth/configuration-not-found' || err.code === 'auth/invalid-api-key') {
         displayStatus('Firebase not configured yet. Please add your Firebase config to firebase.js');
       } else {
@@ -72,16 +58,11 @@ const LoginForm = ({ onLogin }) => {
       setGoogleLoading(false);
     }
   };
-
-  // ── LOGIN ──────────────────────────────────────────────────────────────────
   const handleLogin = (e) => {
     e.preventDefault();
     clearStatus();
-
     if (!email)    return displayStatus('Email is required.');
     if (!password) return displayStatus('Password is required.');
-
-    // Check admin first
     if (
       email.toLowerCase() === ADMIN.email &&
       password === ADMIN.password
@@ -90,13 +71,10 @@ const LoginForm = ({ onLogin }) => {
       setTimeout(() => onLogin?.({ email: ADMIN.email, name: ADMIN.name, role: 'admin' }), 600);
       return;
     }
-
-    // Check localStorage registered users
     const stored = getStoredUsers();
     const found  = stored.find(
       u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
     );
-
     if (found) {
       displayStatus(`Welcome back, ${found.name}!`, false);
       setTimeout(() => onLogin?.({ email: found.email, name: found.name, role: 'user' }), 600);
@@ -104,43 +82,32 @@ const LoginForm = ({ onLogin }) => {
       displayStatus('Invalid email or password.');
     }
   };
-
-  // ── SIGN UP ────────────────────────────────────────────────────────────────
   const handleSignUp = (e) => {
     e.preventDefault();
     clearStatus();
-
     if (!name.trim())    return displayStatus('Full name is required.');
     if (!email.trim())   return displayStatus('Email is required.');
     if (!/^\S+@\S+\.\S+$/.test(email)) return displayStatus('Enter a valid email address.');
     if (password.length < 6)           return displayStatus('Password must be at least 6 characters.');
     if (password !== confirmPassword)  return displayStatus('Passwords do not match.');
-
-    // Check duplicate
     const stored    = getStoredUsers();
     const duplicate = stored.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (duplicate || email.toLowerCase() === ADMIN.email) {
       return displayStatus('An account with this email already exists.');
     }
-
     const newUser = { name: name.trim(), email: email.toLowerCase(), password, role: 'user' };
     saveUser(newUser);
-
     displayStatus(`Account created! Welcome, ${newUser.name}!`, false);
     setTimeout(() => onLogin?.({ email: newUser.email, name: newUser.name, role: 'user' }), 800);
   };
-
   const statusClass = status.message
     ? status.isError
       ? 'bg-red-900/50 border border-red-800 text-red-200'
       : 'bg-green-900/50 border border-green-800 text-green-200'
     : 'hidden';
-
   return (
     <div className="w-full lg:w-1/2 p-6 sm:p-12 flex items-center justify-center bg-gray-950">
       <div className="bg-gray-900 border border-gray-800 rounded-3xl p-8 max-w-md w-full shadow-2xl">
-
-        {/* ── Mode Tabs ── */}
         <div className="flex bg-gray-800 rounded-2xl p-1 mb-8">
           <button
             type="button"
@@ -165,8 +132,6 @@ const LoginForm = ({ onLogin }) => {
             Sign Up
           </button>
         </div>
-
-        {/* ── Header ── */}
         <div className="text-center mb-7">
           <h2 className="text-2xl font-bold text-white">
             {mode === 'login' ? 'Welcome Back 👋' : 'Create Account 🚀'}
@@ -177,15 +142,11 @@ const LoginForm = ({ onLogin }) => {
               : 'Join the team and showcase your skills'}
           </p>
         </div>
-
-        {/* ── Status ── */}
         {status.message && (
           <div className={`p-3 rounded-xl text-sm text-center mb-5 ${statusClass}`}>
             {status.message}
           </div>
         )}
-
-        {/* ── Google Sign-In ── */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
@@ -207,17 +168,13 @@ const LoginForm = ({ onLogin }) => {
           )}
           {googleLoading ? 'Signing in…' : 'Continue with Google'}
         </button>
-
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 h-px bg-gray-800" />
           <span className="text-gray-600 text-xs">or use email</span>
           <div className="flex-1 h-px bg-gray-800" />
         </div>
-
-        {/* ── SIGN IN FORM ── */}
         {mode === 'login' && (
           <form onSubmit={handleLogin} className="space-y-4">
-            {/* Quick fills */}
             <div className="flex gap-2 flex-wrap">
               <button type="button"
                 onClick={() => { setEmail('admin@admin.com'); setPassword('admin'); }}
@@ -232,7 +189,6 @@ const LoginForm = ({ onLogin }) => {
                 className="text-[11px] px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-300 hover:bg-gray-700 transition-colors"
               >🧑 Last Registered User</button>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
               <input
@@ -243,7 +199,6 @@ const LoginForm = ({ onLogin }) => {
                 onChange={e => setEmail(e.target.value)}
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
               <div className="relative">
@@ -260,12 +215,10 @@ const LoginForm = ({ onLogin }) => {
                 </button>
               </div>
             </div>
-
             <button type="submit"
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition hover:-translate-y-0.5">
               Sign In
             </button>
-
             <p className="text-center text-sm text-gray-500">
               Don't have an account?{' '}
               <button type="button" onClick={() => switchMode('signup')}
@@ -275,8 +228,6 @@ const LoginForm = ({ onLogin }) => {
             </p>
           </form>
         )}
-
-        {/* ── SIGN UP FORM ── */}
         {mode === 'signup' && (
           <form onSubmit={handleSignUp} className="space-y-4">
             <div>
@@ -289,7 +240,6 @@ const LoginForm = ({ onLogin }) => {
                 onChange={e => setName(e.target.value)}
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
               <input
@@ -300,7 +250,6 @@ const LoginForm = ({ onLogin }) => {
                 onChange={e => setEmail(e.target.value)}
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Password <span className="text-gray-500 font-normal text-xs">(min. 6 chars)</span></label>
               <div className="relative">
@@ -317,7 +266,6 @@ const LoginForm = ({ onLogin }) => {
                 </button>
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Confirm Password</label>
               <input
@@ -335,12 +283,10 @@ const LoginForm = ({ onLogin }) => {
                 <p className="text-red-400 text-xs mt-1">Passwords do not match</p>
               )}
             </div>
-
             <button type="submit"
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition hover:-translate-y-0.5">
               Create Account
             </button>
-
             <p className="text-center text-sm text-gray-500">
               Already have an account?{' '}
               <button type="button" onClick={() => switchMode('login')}
@@ -354,5 +300,4 @@ const LoginForm = ({ onLogin }) => {
     </div>
   );
 };
-
 export default LoginForm;

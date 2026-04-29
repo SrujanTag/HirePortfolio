@@ -1,41 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
-
-// ── Bot Brain ────────────────────────────────────────────────────────────────
 const GREETINGS = ['hi', 'hello', 'hey', 'hola', 'sup', 'yo'];
 const HELP_KEYWORDS = ['help', 'what can you do', 'commands', 'options'];
 const HIRE_KEYWORDS = ['hire', 'enquire', 'enquiry', 'job', 'recruit', 'work with', 'team'];
 const CONTACT_KEYWORDS = ['contact', 'email', 'reach', 'touch', 'mail'];
 const TEAM_KEYWORDS = ['team', 'member', 'who', 'list', 'all', 'everyone', 'people'];
-
-
 function botReply(input, users, onNavigate) {
   const q = input.toLowerCase().trim();
-
-  // Greeting
   if (GREETINGS.some(g => q === g || q.startsWith(g + ' '))) {
     return {
       text: "Hey there! 👋 I'm LeapBot, your HirePortfolio assistant. I can help you:\n\n• Find talent by skill or role\n• Browse the team\n• Connect with members\n\nJust ask me anything!",
       actions: [],
     };
   }
-
-  // Help
   if (HELP_KEYWORDS.some(k => q.includes(k))) {
     return {
       text: "Here's what I can do 🤖\n\n• **Find by skill** — type a skill like \"React\" or \"Python\"\n• **Find by role** — \"frontend developer\" or \"designer\"\n• **Team list** — \"show team\"\n• **Hire someone** — \"hire [name]\"\n• **Contact info** — \"contact\"",
       actions: [],
     };
   }
-
-  // Contact
   if (CONTACT_KEYWORDS.some(k => q.includes(k))) {
     return {
       text: "You can reach the team via:\n\n📧 team@hireportfolio.dev\n🐙 github.com/SrujanTag\n💼 linkedin.com/company/devleopards\n\nOr click \"View Profile\" on any card to see their direct links!",
       actions: [{ label: '📂 Browse Portfolio', action: () => onNavigate('portfolio') }],
     };
   }
-
-  // Team list
   if (TEAM_KEYWORDS.some(k => q.includes(k))) {
     const list = users.map(u => `• ${u.name} — ${u.role}`).join('\n');
     return {
@@ -43,8 +31,6 @@ function botReply(input, users, onNavigate) {
       actions: [{ label: '📂 Open Portfolio', action: () => onNavigate('portfolio') }],
     };
   }
-
-  // Hire by name
   if (HIRE_KEYWORDS.some(k => q.includes(k))) {
     const matched = users.filter(u =>
       u.name.toLowerCase().split(' ').some(part => q.includes(part))
@@ -64,8 +50,6 @@ function botReply(input, users, onNavigate) {
       actions: [{ label: '💼 Go to Hire Page', action: () => onNavigate('hire') }],
     };
   }
-
-  // Skill match
   const skillMatch = users.filter(u => {
     const allSkills = [
       ...(u.skills?.frontend || []),
@@ -74,7 +58,6 @@ function botReply(input, users, onNavigate) {
     ].map(s => s.toLowerCase());
     return allSkills.some(s => q.includes(s) || s.includes(q.split(' ').find(w => w.length > 2) || ''));
   });
-
   if (skillMatch.length > 0) {
     const names = skillMatch.map(u => `• ${u.name} (${u.role})`).join('\n');
     return {
@@ -85,13 +68,10 @@ function botReply(input, users, onNavigate) {
       ],
     };
   }
-
-  // Role match
   const roleMatch = users.filter(u => {
     const words = q.split(' ').filter(w => w.length > 3);
     return words.some(w => u.role.toLowerCase().includes(w));
   });
-
   if (roleMatch.length > 0) {
     const names = roleMatch.map(u => `• ${u.name} — ${u.role}`).join('\n');
     return {
@@ -99,15 +79,11 @@ function botReply(input, users, onNavigate) {
       actions: [{ label: '📂 Open Portfolio', action: () => onNavigate('portfolio') }],
     };
   }
-
-  // Fallback
   return {
     text: "Hmm, I'm not sure about that 🤔 Try asking me:\n\n• \"Show me React developers\"\n• \"Who is available?\"\n• \"Hire a designer\"\n• \"Contact the team\"",
     actions: [],
   };
 }
-
-// ── Typing indicator ─────────────────────────────────────────────────────────
 function TypingDots() {
   return (
     <div className="flex items-center gap-1 px-4 py-3">
@@ -121,8 +97,6 @@ function TypingDots() {
     </div>
   );
 }
-
-// ── Message bubble ───────────────────────────────────────────────────────────
 function Bubble({ msg }) {
   const isBot = msg.sender === 'bot';
   return (
@@ -139,7 +113,6 @@ function Bubble({ msg }) {
         } px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap`}
       >
         {msg.text}
-        {/* Action buttons */}
         {msg.actions?.length > 0 && (
           <div className="flex flex-col gap-1.5 mt-3">
             {msg.actions.map((a, i) => (
@@ -157,16 +130,12 @@ function Bubble({ msg }) {
     </div>
   );
 }
-
-// ── Quick Replies ─────────────────────────────────────────────────────────────
 const QUICK_REPLIES = [
   '👥 Show team',
   '💼 Hire talent',
   '⚡ React devs',
   '✉️ Contact',
 ];
-
-// ── Main ChatBot ─────────────────────────────────────────────────────────────
 const ChatBot = ({ users = [], onNavigate }) => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -182,32 +151,25 @@ const ChatBot = ({ users = [], onNavigate }) => {
   const [unread, setUnread]   = useState(0);
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
-
   // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, typing]);
-
-  // Focus input when opened
   useEffect(() => {
     if (open) {
       setUnread(0);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open]);
-
   const pushMessage = (msg) => {
     setMessages(prev => [...prev, { id: Date.now() + Math.random(), ...msg }]);
   };
-
   const sendMessage = (text) => {
     const trimmed = (text || input).trim();
     if (!trimmed) return;
-
     pushMessage({ sender: 'user', text: trimmed, actions: [] });
     setInput('');
     setTyping(true);
-
     const DELAY = 600 + Math.random() * 600; // human-like 0.6–1.2s
     setTimeout(() => {
       setTyping(false);
@@ -221,17 +183,14 @@ const ChatBot = ({ users = [], onNavigate }) => {
       if (!open) setUnread(n => n + 1);
     }, DELAY);
   };
-
   const handleKey = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   };
-
   return (
     <>
-      {/* Chat panel */}
       <div
         className={`fixed bottom-24 right-4 z-[9990] w-80 sm:w-96 flex flex-col
           bg-[#0F1117] border border-[#1F232C] rounded-2xl shadow-2xl
@@ -239,7 +198,6 @@ const ChatBot = ({ users = [], onNavigate }) => {
           ${open ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'}`}
         style={{ maxHeight: '520px' }}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#1F232C] bg-gradient-to-r from-blue-900/30 to-purple-900/20 rounded-t-2xl">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm">
@@ -260,8 +218,6 @@ const ChatBot = ({ users = [], onNavigate }) => {
             ×
           </button>
         </div>
-
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1" style={{ minHeight: 0 }}>
           {messages.map(msg => (
             <Bubble key={msg.id} msg={msg} />
@@ -276,8 +232,6 @@ const ChatBot = ({ users = [], onNavigate }) => {
           )}
           <div ref={bottomRef} />
         </div>
-
-        {/* Quick replies */}
         <div className="flex gap-1.5 px-4 pb-2 flex-wrap">
           {QUICK_REPLIES.map(q => (
             <button
@@ -289,8 +243,6 @@ const ChatBot = ({ users = [], onNavigate }) => {
             </button>
           ))}
         </div>
-
-        {/* Input */}
         <div className="flex items-center gap-2 px-4 py-3 border-t border-[#1F232C]">
           <input
             ref={inputRef}
@@ -312,8 +264,6 @@ const ChatBot = ({ users = [], onNavigate }) => {
           </button>
         </div>
       </div>
-
-      {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
         className={`fixed bottom-4 right-4 z-[9991] w-14 h-14 rounded-full shadow-2xl
@@ -331,7 +281,6 @@ const ChatBot = ({ users = [], onNavigate }) => {
         ) : (
           <span>💬</span>
         )}
-        {/* Unread badge */}
         {!open && unread > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
             {unread}
@@ -341,5 +290,4 @@ const ChatBot = ({ users = [], onNavigate }) => {
     </>
   );
 };
-
 export default ChatBot;

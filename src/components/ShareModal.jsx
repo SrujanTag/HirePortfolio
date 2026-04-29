@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-
 const ShareModal = ({ member, onClose }) => {
   const [copied, setCopied] = useState(false);
-
-  // Build the shareable URL — uses the current page origin + a hash
   const pageUrl = encodeURIComponent(
     `${window.location.origin}${window.location.pathname}#profile-${member?.id}`
   );
   const shareText = encodeURIComponent(
     `Check out ${member?.name} — ${member?.role} on HirePortfolio! 🚀`
   );
-
   const links = [
     {
       label: 'Twitter / X',
@@ -37,14 +33,12 @@ const ShareModal = ({ member, onClose }) => {
       href: `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
     },
   ];
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(decodeURIComponent(pageUrl));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
       const el = document.createElement('textarea');
       el.value = decodeURIComponent(pageUrl);
       document.body.appendChild(el);
@@ -55,8 +49,6 @@ const ShareModal = ({ member, onClose }) => {
       setTimeout(() => setCopied(false), 2000);
     }
   };
-
-  // Web Share API (native — works great on mobile)
   const handleNativeShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -66,21 +58,16 @@ const ShareModal = ({ member, onClose }) => {
       }).catch(() => {});
     }
   };
-
   return (
     <div
       className="fixed inset-0 z-[10000] flex items-center justify-center p-4"
       onClick={onClose}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-
-      {/* Modal */}
       <div
         className="relative bg-[#0F1117] border border-[#1F232C] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-white font-bold text-lg">Share Profile</h3>
@@ -95,8 +82,6 @@ const ShareModal = ({ member, onClose }) => {
             ×
           </button>
         </div>
-
-        {/* Social share buttons */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {links.map((link) => (
             <a
@@ -111,8 +96,6 @@ const ShareModal = ({ member, onClose }) => {
             </a>
           ))}
         </div>
-
-        {/* Copy link */}
         <div className="flex items-center gap-2 bg-[#161922] border border-[#2F333A] rounded-xl px-3 py-2.5 mb-3">
           <span className="text-gray-500 text-xs truncate flex-1">
             {decodeURIComponent(pageUrl).replace(/^https?:\/\//, '')}
@@ -128,8 +111,6 @@ const ShareModal = ({ member, onClose }) => {
             {copied ? '✓ Copied!' : 'Copy'}
           </button>
         </div>
-
-        {/* Native share (mobile) */}
         {typeof navigator !== 'undefined' && navigator.share && (
           <button
             onClick={handleNativeShare}
@@ -142,5 +123,4 @@ const ShareModal = ({ member, onClose }) => {
     </div>
   );
 };
-
 export default ShareModal;

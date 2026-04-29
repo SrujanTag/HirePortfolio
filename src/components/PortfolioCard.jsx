@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, Trash2 } from './icons';
-
 const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
-
   const colorMap = {
     cyan:    'from-cyan-400',
     purple:  'from-purple-400',
@@ -14,42 +12,31 @@ const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) 
     red:     'from-red-400',
     yellow:  'from-yellow-400',
   };
-
   const gradientFrom = colorMap[person.color] || 'from-blue-400';
   const allSkills = [
     ...(person.skills?.frontend || []),
     ...(person.skills?.backend  || []),
   ].slice(0, 3);
-
-  // Can delete if: admin (any card) OR logged-in user owns this card (matched by email)
   const isAdmin      = currentUser?.role === 'admin';
   const isOwner      = currentUser && currentUser.email === person.email;
   const canDelete    = isAdmin || isOwner;
-
   const handleDeleteClick = (e) => {
     e.stopPropagation();
     setConfirmDelete(true);
   };
-
   const handleConfirm = (e) => {
     e.stopPropagation();
     onDeleteProfile(person.id);
   };
-
   const handleCancel = (e) => {
     e.stopPropagation();
     setConfirmDelete(false);
   };
-
-  // Avatar: use placeholder initials if no avatar image
   const initials = person.name
     ? person.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : '?';
-
   return (
     <div className="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col h-full group relative">
-
-      {/* Delete confirm overlay */}
       {confirmDelete && (
         <div className="absolute inset-0 z-20 bg-gray-900/95 rounded-xl flex flex-col items-center justify-center gap-4 p-6 text-center">
           <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/30">
@@ -79,7 +66,6 @@ const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) 
           </div>
         </div>
       )}
-
       <div className="p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6">
         <div className="flex-shrink-0">
           <div className={`w-24 h-24 rounded-full p-1 bg-gradient-to-br ${gradientFrom} to-blue-600 transform group-hover:scale-110 transition-transform duration-300`}>
@@ -91,7 +77,6 @@ const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) 
                 onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
               />
             ) : null}
-            {/* Fallback initials */}
             <div
               className={`w-full h-full rounded-full bg-gray-900 flex items-center justify-center border-2 border-transparent group-hover:border-white transition-all text-xl font-black text-white ${person.avatar ? 'hidden' : 'flex'}`}
             >
@@ -99,7 +84,6 @@ const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) 
             </div>
           </div>
         </div>
-
         <div className="flex-1 text-center sm:text-left min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
@@ -110,7 +94,6 @@ const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) 
                 {person.role}
               </p>
             </div>
-            {/* Delete icon — top-right of card info */}
             {canDelete && (
               <button
                 onClick={handleDeleteClick}
@@ -121,7 +104,6 @@ const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) 
               </button>
             )}
           </div>
-
           <div className="flex flex-wrap gap-2 justify-center sm:justify-start mb-4">
             {allSkills.map((skill, index) => (
               <span
@@ -134,7 +116,6 @@ const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) 
           </div>
         </div>
       </div>
-
       <div className="mt-auto bg-gray-900/50 p-4 border-t border-gray-700 flex justify-between items-center">
         <span className="text-xs text-gray-500">Available for hire</span>
         <button
@@ -147,5 +128,4 @@ const PortfolioCard = ({ person, onViewProfile, onDeleteProfile, currentUser }) 
     </div>
   );
 };
-
 export default PortfolioCard;

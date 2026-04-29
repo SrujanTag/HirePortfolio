@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ArrowLeft, User, Zap, Terminal } from './icons';
-
 const COLORS = ['cyan', 'purple', 'emerald', 'blue', 'pink', 'orange', 'red', 'yellow'];
 const ROLES = [
   'Full Stack Developer',
@@ -12,7 +11,6 @@ const ROLES = [
   'DevOps Engineer',
   'Mobile Developer',
 ];
-
 const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
   const [form, setForm] = useState({
     name: currentUser?.name || '',
@@ -31,7 +29,6 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
   });
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
-
   const validate = () => {
     const e = {};
     if (!form.name.trim()) e.name = 'Name is required.';
@@ -40,19 +37,15 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
     if (!form.frontendSkills.trim()) e.frontendSkills = 'At least one skill is required.';
     return e;
   };
-
   const handleChange = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }));
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-
     const splitSkills = (str) => str.split(',').map(s => s.trim()).filter(Boolean);
-
     const newProfile = {
       id: Date.now(),
       name: form.name.trim(),
@@ -74,11 +67,9 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
         year: form.year.trim(),
       },
     };
-
     onAddProfile(newProfile);
     setSubmitted(true);
   };
-
   if (submitted) {
     return (
       <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center px-4">
@@ -100,13 +91,10 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
       </div>
     );
   }
-
   const inputClass = (field) =>
     `w-full bg-[#1C1F26] border ${errors[field] ? 'border-red-500' : 'border-[#2F333A]'} text-gray-200 p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600 text-sm`;
-
   return (
     <div className="min-h-screen bg-[#0B0E14] text-gray-300 pb-20">
-      {/* Header */}
       <div className="max-w-3xl mx-auto px-4 py-6">
         <button
           onClick={onBack}
@@ -114,8 +102,6 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
         >
           <ArrowLeft size={16} /> Back to Portfolio
         </button>
-
-        {/* Hero */}
         <div className="text-center mb-12 relative">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-900/20 rounded-full blur-[100px] pointer-events-none" />
           <div className="relative z-10">
@@ -131,15 +117,11 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
             <p className="text-gray-400">Fill in your details and get featured on the portfolio grid.</p>
           </div>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* Basic Info */}
           <div className="bg-[#11141B] rounded-2xl border border-[#1F232C] p-6 space-y-4">
             <h3 className="text-white font-bold text-lg flex items-center gap-2">
               <User size={20} className="text-blue-400" /> Basic Info
             </h3>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">Full Name *</label>
@@ -152,7 +134,6 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
                 {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
               </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">Role</label>
@@ -175,7 +156,6 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
                 </div>
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5">Bio * <span className="text-gray-600">(2-3 sentences)</span></label>
               <textarea
@@ -188,13 +168,10 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
               {errors.bio && <p className="text-red-400 text-xs mt-1">{errors.bio}</p>}
             </div>
           </div>
-
-          {/* Skills */}
           <div className="bg-[#11141B] rounded-2xl border border-[#1F232C] p-6 space-y-4">
             <h3 className="text-white font-bold text-lg flex items-center gap-2">
               <Zap size={20} className="text-yellow-400" /> Skills <span className="text-xs font-normal text-gray-500">(comma-separated)</span>
             </h3>
-
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5 flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" /> Frontend / Primary Skills *
@@ -202,14 +179,12 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
               <input className={inputClass('frontendSkills')} placeholder="React, TypeScript, Tailwind CSS" value={form.frontendSkills} onChange={e => handleChange('frontendSkills', e.target.value)} />
               {errors.frontendSkills && <p className="text-red-400 text-xs mt-1">{errors.frontendSkills}</p>}
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5 flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Backend / Secondary Skills
               </label>
               <input className={inputClass('backendSkills')} placeholder="Node.js, Express, MongoDB" value={form.backendSkills} onChange={e => handleChange('backendSkills', e.target.value)} />
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5 flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-orange-500 inline-block" /> Tools & Others
@@ -217,13 +192,10 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
               <input className={inputClass('tools')} placeholder="Git, Docker, Figma" value={form.tools} onChange={e => handleChange('tools', e.target.value)} />
             </div>
           </div>
-
-          {/* Links */}
           <div className="bg-[#11141B] rounded-2xl border border-[#1F232C] p-6 space-y-4">
             <h3 className="text-white font-bold text-lg flex items-center gap-2">
               <Terminal size={20} className="text-purple-400" /> Links & Education
             </h3>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">GitHub URL</label>
@@ -234,7 +206,6 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
                 <input className={inputClass('linkedin')} placeholder="https://linkedin.com/in/username" value={form.linkedin} onChange={e => handleChange('linkedin', e.target.value)} />
               </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">School / University</label>
@@ -245,14 +216,11 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
                 <input className={inputClass('year')} placeholder="2025–2029" value={form.year} onChange={e => handleChange('year', e.target.value)} />
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5">Degree</label>
               <input className={inputClass('degree')} value={form.degree} onChange={e => handleChange('degree', e.target.value)} />
             </div>
           </div>
-
-          {/* Submit */}
           <div className="flex gap-4">
             <button
               type="submit"
@@ -273,5 +241,4 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
     </div>
   );
 };
-
 export default AddProfileForm;

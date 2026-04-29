@@ -12,23 +12,17 @@ import ChatBot from './components/ChatBot';
 import { ToastProvider } from './components/Toast';
 import { useDeviceSession } from './hooks/useDeviceSession';
 import { USERS } from './data/constants';
-
-// ── Inner app (needs access to currentUser for device session hook) ───────────
 function InnerApp() {
   const [activePage, setActivePage] = useState('home');
   const [selectedMember, setSelectedMember] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [activeRole, setActiveRole] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-
   // Auth state
   const [currentUser, setCurrentUser] = useState(null);
-
   // Users list — starts with the static seed data; new profiles are appended
   const [users, setUsers] = useState(USERS);
-
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
-
   // ── Device session (2-device limit) ─────────────────────────────────────────
   const handleForceLogout = () => {
     setCurrentUser(null);
@@ -36,50 +30,37 @@ function InnerApp() {
     window.scrollTo(0, 0);
   };
   useDeviceSession(currentUser?.email, handleForceLogout);
-
-  // ── Auth ────────────────────────────────────────────────────────────────────
   const handleLogin = (user) => {
     setCurrentUser(user);
     setActivePage('portfolio');
     window.scrollTo(0, 0);
   };
-
   const handleLogout = () => {
     setCurrentUser(null);
     setActivePage('home');
     window.scrollTo(0, 0);
   };
-
-  // ── Navigation ───────────────────────────────────────────────────────────────
   const handleSelectMember = (member) => {
     setSelectedMember(member);
     setActivePage('profile_details');
     window.scrollTo(0, 0);
   };
-
   const handleHireMember = (member) => {
     setSelectedMember(member);
     setActivePage('hire');
     window.scrollTo(0, 0);
   };
-
   const handleFindTalent = (role) => {
     setActiveRole(role === 'Full Stack Developer' ? 'Full Stack' : role.split(' ')[0]);
     setActivePage('portfolio');
     window.scrollTo(0, 0);
   };
-
-  // ── Add Profile ──────────────────────────────────────────────────────────────
   const handleAddProfile = (profileData) => {
     setUsers(prev => [...prev, profileData]);
   };
-
-  // ── Delete Profile ───────────────────────────────────────────────────────────
   const handleDeleteProfile = (id) => {
     setUsers(prev => prev.filter(u => u.id !== id));
   };
-
-  // ── ChatBot navigation handler ────────────────────────────────────────────────
   const handleBotNavigate = (page, person) => {
     if (page === 'hire') {
       setSelectedMember(person || null);
@@ -92,13 +73,10 @@ function InnerApp() {
     }
     window.scrollTo(0, 0);
   };
-
-  // ── Render ───────────────────────────────────────────────────────────────────
   const renderContent = () => {
     switch (activePage) {
       case 'home':
         return <HomePage onNavigate={setActivePage} />;
-
       case 'portfolio':
         return (
           <PortfolioGrid
@@ -113,7 +91,6 @@ function InnerApp() {
             onDeleteProfile={handleDeleteProfile}
           />
         );
-
       case 'hire':
         return (
           <HireTalentPage
@@ -121,10 +98,8 @@ function InnerApp() {
             onFindTalent={handleFindTalent}
           />
         );
-
       case 'login':
         return <LoginPage onLogin={handleLogin} />;
-
       case 'profile_details':
         return (
           <MemberProfile
@@ -133,7 +108,6 @@ function InnerApp() {
             onBack={() => setActivePage('portfolio')}
           />
         );
-
       case 'add_profile':
         return (
           <AddProfileForm
@@ -142,7 +116,6 @@ function InnerApp() {
             onBack={() => setActivePage('portfolio')}
           />
         );
-
       default:
         return (
           <PortfolioGrid
@@ -159,13 +132,11 @@ function InnerApp() {
         );
     }
   };
-
   const showSidebar = ['portfolio', 'home', 'hire'].includes(activePage);
   const sidebarVariant =
     activePage === 'portfolio' ? undefined :
     activePage === 'hire'      ? 'minimal' :
     'home';
-
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col font-sans">
       <Navbar
@@ -178,7 +149,6 @@ function InnerApp() {
         currentUser={currentUser}
         onLogout={handleLogout}
       />
-
       <div className="flex flex-1 relative">
         {showSidebar && (
           <Sidebar
@@ -191,21 +161,15 @@ function InnerApp() {
             variant={sidebarVariant}
           />
         )}
-
         <div className="flex-1 w-full bg-gray-950">
           {renderContent()}
         </div>
       </div>
-
       <Footer />
-
-      {/* Global floating chatbot — always visible */}
       <ChatBot users={users} onNavigate={handleBotNavigate} />
     </div>
   );
 }
-
-// ── Root export wraps InnerApp with the Toast context ────────────────────────
 export default function App() {
   return (
     <ToastProvider>
@@ -213,4 +177,3 @@ export default function App() {
     </ToastProvider>
   );
 }
-
