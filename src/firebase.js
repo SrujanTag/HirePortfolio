@@ -15,12 +15,13 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId:             "YOUR_APP_ID",
+  apiKey: "AIzaSyAQH22e1Wrj8UTdXybr4VHPl84jsuatlGo",
+  authDomain: "hireportfolio.firebaseapp.com",
+  projectId: "hireportfolio",
+  storageBucket: "hireportfolio.firebasestorage.app",
+  messagingSenderId: "614206818974",
+  appId: "1:614206818974:web:9faa14d2b1b8d1713c498f",
+  measurementId: "G-832C3ZETJX"
 };
 
 // ── Detect if Firebase is configured ─────────────────────────────────────────
