@@ -18,19 +18,16 @@ function InnerApp() {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [activeRole, setActiveRole] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  // Auth state
   const [currentUser, setCurrentUser] = useState(null);
-  // Users list — starts with the static seed data; new profiles are appended
   const [users, setUsers] = useState(USERS);
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
-  // ── Device session (2-device limit) ─────────────────────────────────────────
   const handleForceLogout = () => {
     setCurrentUser(null);
     setActivePage('login');
     window.scrollTo(0, 0);
   };
   useDeviceSession(currentUser?.email, handleForceLogout);
-  const handleLogin = (user) => {
+  const handleLogin = user => {
     setCurrentUser(user);
     setActivePage('portfolio');
     window.scrollTo(0, 0);
@@ -40,25 +37,25 @@ function InnerApp() {
     setActivePage('home');
     window.scrollTo(0, 0);
   };
-  const handleSelectMember = (member) => {
+  const handleSelectMember = member => {
     setSelectedMember(member);
     setActivePage('profile_details');
     window.scrollTo(0, 0);
   };
-  const handleHireMember = (member) => {
+  const handleHireMember = member => {
     setSelectedMember(member);
     setActivePage('hire');
     window.scrollTo(0, 0);
   };
-  const handleFindTalent = (role) => {
+  const handleFindTalent = role => {
     setActiveRole(role === 'Full Stack Developer' ? 'Full Stack' : role.split(' ')[0]);
     setActivePage('portfolio');
     window.scrollTo(0, 0);
   };
-  const handleAddProfile = (profileData) => {
+  const handleAddProfile = profileData => {
     setUsers(prev => [...prev, profileData]);
   };
-  const handleDeleteProfile = (id) => {
+  const handleDeleteProfile = id => {
     setUsers(prev => prev.filter(u => u.id !== id));
   };
   const handleBotNavigate = (page, person) => {
@@ -78,102 +75,38 @@ function InnerApp() {
       case 'home':
         return <HomePage onNavigate={setActivePage} />;
       case 'portfolio':
-        return (
-          <PortfolioGrid
-            users={users}
-            isSidebarOpen={isSidebarOpen}
-            toggleSidebar={toggleSidebar}
-            activeRole={activeRole}
-            searchQuery={searchQuery}
-            onSelectMember={handleSelectMember}
-            currentUser={currentUser}
-            onAddProfile={() => setActivePage('add_profile')}
-            onDeleteProfile={handleDeleteProfile}
-          />
-        );
+        return <PortfolioGrid users={users} isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} activeRole={activeRole} searchQuery={searchQuery} onSelectMember={handleSelectMember} currentUser={currentUser} onAddProfile={() => setActivePage('add_profile')} onDeleteProfile={handleDeleteProfile} />;
       case 'hire':
-        return (
-          <HireTalentPage
-            prefilledMember={selectedMember}
-            onFindTalent={handleFindTalent}
-          />
-        );
+        return <HireTalentPage prefilledMember={selectedMember} onFindTalent={handleFindTalent} />;
       case 'login':
         return <LoginPage onLogin={handleLogin} />;
       case 'profile_details':
-        return (
-          <MemberProfile
-            baseMember={selectedMember}
-            onHire={handleHireMember}
-            onBack={() => setActivePage('portfolio')}
-          />
-        );
+        return <MemberProfile baseMember={selectedMember} onHire={handleHireMember} onBack={() => setActivePage('portfolio')} />;
       case 'add_profile':
-        return (
-          <AddProfileForm
-            currentUser={currentUser}
-            onAddProfile={handleAddProfile}
-            onBack={() => setActivePage('portfolio')}
-          />
-        );
+        return <AddProfileForm currentUser={currentUser} onAddProfile={handleAddProfile} onBack={() => setActivePage('portfolio')} />;
       default:
-        return (
-          <PortfolioGrid
-            users={users}
-            isSidebarOpen={isSidebarOpen}
-            toggleSidebar={toggleSidebar}
-            activeRole={activeRole}
-            searchQuery={searchQuery}
-            onSelectMember={handleSelectMember}
-            currentUser={currentUser}
-            onAddProfile={() => setActivePage('add_profile')}
-            onDeleteProfile={handleDeleteProfile}
-          />
-        );
+        return <PortfolioGrid users={users} isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} activeRole={activeRole} searchQuery={searchQuery} onSelectMember={handleSelectMember} currentUser={currentUser} onAddProfile={() => setActivePage('add_profile')} onDeleteProfile={handleDeleteProfile} />;
     }
   };
   const showSidebar = ['portfolio', 'home', 'hire'].includes(activePage);
-  const sidebarVariant =
-    activePage === 'portfolio' ? undefined :
-    activePage === 'hire'      ? 'minimal' :
-    'home';
-  return (
-    <div className="min-h-screen bg-gray-950 flex flex-col font-sans">
-      <Navbar
-        activePage={activePage}
-        setActivePage={(page) => {
-          setActivePage(page);
-          setSelectedMember(null);
-        }}
-        toggleSidebar={toggleSidebar}
-        currentUser={currentUser}
-        onLogout={handleLogout}
-      />
+  const sidebarVariant = activePage === 'portfolio' ? undefined : activePage === 'hire' ? 'minimal' : 'home';
+  return <div className="min-h-screen bg-gray-950 flex flex-col font-sans">
+      <Navbar activePage={activePage} setActivePage={page => {
+      setActivePage(page);
+      setSelectedMember(null);
+    }} toggleSidebar={toggleSidebar} currentUser={currentUser} onLogout={handleLogout} />
       <div className="flex flex-1 relative">
-        {showSidebar && (
-          <Sidebar
-            isOpen={isSidebarOpen}
-            toggle={toggleSidebar}
-            activeRole={activeRole}
-            setActiveRole={activePage === 'portfolio' ? setActiveRole : undefined}
-            searchQuery={searchQuery}
-            setSearchQuery={activePage === 'portfolio' ? setSearchQuery : undefined}
-            variant={sidebarVariant}
-          />
-        )}
+        {showSidebar && <Sidebar isOpen={isSidebarOpen} toggle={toggleSidebar} activeRole={activeRole} setActiveRole={activePage === 'portfolio' ? setActiveRole : undefined} searchQuery={searchQuery} setSearchQuery={activePage === 'portfolio' ? setSearchQuery : undefined} variant={sidebarVariant} />}
         <div className="flex-1 w-full bg-gray-950">
           {renderContent()}
         </div>
       </div>
       <Footer />
       <ChatBot users={users} onNavigate={handleBotNavigate} />
-    </div>
-  );
+    </div>;
 }
 export default function App() {
-  return (
-    <ToastProvider>
+  return <ToastProvider>
       <InnerApp />
-    </ToastProvider>
-  );
+    </ToastProvider>;
 }

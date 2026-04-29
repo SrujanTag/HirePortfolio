@@ -8,48 +8,65 @@ const getStoredUsers = () => {
     return [];
   }
 };
-const saveUser = (user) => {
+const saveUser = user => {
   const existing = getStoredUsers();
-  const updated  = [...existing, user];
+  const updated = [...existing, user];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 };
-const ADMIN = { email: 'admin@admin.com', password: 'admin', name: 'Admin', role: 'admin' };
-const LoginForm = ({ onLogin }) => {
-  const [mode, setMode] = useState('login'); 
-  const [name,            setName]            = useState('');
-  const [email,           setEmail]           = useState('');
-  const [password,        setPassword]        = useState('');
+const ADMIN = {
+  email: 'admin@admin.com',
+  password: 'admin',
+  name: 'Admin',
+  role: 'admin'
+};
+const LoginForm = ({
+  onLogin
+}) => {
+  const [mode, setMode] = useState('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword,    setShowPassword]    = useState(false);
-  const [status, setStatus] = useState({ message: '', isError: false });
+  const [showPassword, setShowPassword] = useState(false);
+  const [status, setStatus] = useState({
+    message: '',
+    isError: false
+  });
   const [googleLoading, setGoogleLoading] = useState(false);
-  const displayStatus = (msg, isError = true) => setStatus({ message: msg, isError });
-  const clearStatus   = ()                     => setStatus({ message: '', isError: false });
-  const switchMode = (m) => {
+  const displayStatus = (msg, isError = true) => setStatus({
+    message: msg,
+    isError
+  });
+  const clearStatus = () => setStatus({
+    message: '',
+    isError: false
+  });
+  const switchMode = m => {
     setMode(m);
-    setName(''); setEmail(''); setPassword(''); setConfirmPassword('');
+    setName('');
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
     clearStatus();
   };
-  // ── GOOGLE SIGN-IN ────────────────────────────────────────────────────────
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     clearStatus();
     try {
       const result = await signInWithPopup(auth, provider);
-      const gUser  = result.user;
+      const gUser = result.user;
       const isAdmin = ADMIN_EMAILS.includes(gUser.email?.toLowerCase());
       displayStatus(`Welcome, ${gUser.displayName}! ✨`, false);
       setTimeout(() => {
         onLogin?.({
-          email:  gUser.email,
-          name:   gUser.displayName,
+          email: gUser.email,
+          name: gUser.displayName,
           avatar: gUser.photoURL,
-          role:   isAdmin ? 'admin' : 'user',
+          role: isAdmin ? 'admin' : 'user'
         });
       }, 600);
     } catch (err) {
-      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
-      } else if (err.code === 'auth/configuration-not-found' || err.code === 'auth/invalid-api-key') {
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {} else if (err.code === 'auth/configuration-not-found' || err.code === 'auth/invalid-api-key') {
         displayStatus('Firebase not configured yet. Please add your Firebase config to firebase.js');
       } else {
         displayStatus(err.message || 'Google sign-in failed. Please try again.');
@@ -58,77 +75,68 @@ const LoginForm = ({ onLogin }) => {
       setGoogleLoading(false);
     }
   };
-  const handleLogin = (e) => {
+  const handleLogin = e => {
     e.preventDefault();
     clearStatus();
-    if (!email)    return displayStatus('Email is required.');
+    if (!email) return displayStatus('Email is required.');
     if (!password) return displayStatus('Password is required.');
-    if (
-      email.toLowerCase() === ADMIN.email &&
-      password === ADMIN.password
-    ) {
+    if (email.toLowerCase() === ADMIN.email && password === ADMIN.password) {
       displayStatus('Welcome, Admin!', false);
-      setTimeout(() => onLogin?.({ email: ADMIN.email, name: ADMIN.name, role: 'admin' }), 600);
+      setTimeout(() => onLogin?.({
+        email: ADMIN.email,
+        name: ADMIN.name,
+        role: 'admin'
+      }), 600);
       return;
     }
     const stored = getStoredUsers();
-    const found  = stored.find(
-      u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
+    const found = stored.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
     if (found) {
       displayStatus(`Welcome back, ${found.name}!`, false);
-      setTimeout(() => onLogin?.({ email: found.email, name: found.name, role: 'user' }), 600);
+      setTimeout(() => onLogin?.({
+        email: found.email,
+        name: found.name,
+        role: 'user'
+      }), 600);
     } else {
       displayStatus('Invalid email or password.');
     }
   };
-  const handleSignUp = (e) => {
+  const handleSignUp = e => {
     e.preventDefault();
     clearStatus();
-    if (!name.trim())    return displayStatus('Full name is required.');
-    if (!email.trim())   return displayStatus('Email is required.');
+    if (!name.trim()) return displayStatus('Full name is required.');
+    if (!email.trim()) return displayStatus('Email is required.');
     if (!/^\S+@\S+\.\S+$/.test(email)) return displayStatus('Enter a valid email address.');
-    if (password.length < 6)           return displayStatus('Password must be at least 6 characters.');
-    if (password !== confirmPassword)  return displayStatus('Passwords do not match.');
-    const stored    = getStoredUsers();
+    if (password.length < 6) return displayStatus('Password must be at least 6 characters.');
+    if (password !== confirmPassword) return displayStatus('Passwords do not match.');
+    const stored = getStoredUsers();
     const duplicate = stored.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (duplicate || email.toLowerCase() === ADMIN.email) {
       return displayStatus('An account with this email already exists.');
     }
-    const newUser = { name: name.trim(), email: email.toLowerCase(), password, role: 'user' };
+    const newUser = {
+      name: name.trim(),
+      email: email.toLowerCase(),
+      password,
+      role: 'user'
+    };
     saveUser(newUser);
     displayStatus(`Account created! Welcome, ${newUser.name}!`, false);
-    setTimeout(() => onLogin?.({ email: newUser.email, name: newUser.name, role: 'user' }), 800);
+    setTimeout(() => onLogin?.({
+      email: newUser.email,
+      name: newUser.name,
+      role: 'user'
+    }), 800);
   };
-  const statusClass = status.message
-    ? status.isError
-      ? 'bg-red-900/50 border border-red-800 text-red-200'
-      : 'bg-green-900/50 border border-green-800 text-green-200'
-    : 'hidden';
-  return (
-    <div className="w-full lg:w-1/2 p-6 sm:p-12 flex items-center justify-center bg-gray-950">
+  const statusClass = status.message ? status.isError ? 'bg-red-900/50 border border-red-800 text-red-200' : 'bg-green-900/50 border border-green-800 text-green-200' : 'hidden';
+  return <div className="w-full lg:w-1/2 p-6 sm:p-12 flex items-center justify-center bg-gray-950">
       <div className="bg-gray-900 border border-gray-800 rounded-3xl p-8 max-w-md w-full shadow-2xl">
         <div className="flex bg-gray-800 rounded-2xl p-1 mb-8">
-          <button
-            type="button"
-            onClick={() => switchMode('login')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              mode === 'login'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
+          <button type="button" onClick={() => switchMode('login')} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${mode === 'login' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-gray-400 hover:text-gray-200'}`}>
             Sign In
           </button>
-          <button
-            type="button"
-            onClick={() => switchMode('signup')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              mode === 'signup'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
+          <button type="button" onClick={() => switchMode('signup')} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${mode === 'signup' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-gray-400 hover:text-gray-200'}`}>
             Sign Up
           </button>
         </div>
@@ -137,35 +145,22 @@ const LoginForm = ({ onLogin }) => {
             {mode === 'login' ? 'Welcome Back 👋' : 'Create Account 🚀'}
           </h2>
           <p className="text-gray-400 text-sm mt-1">
-            {mode === 'login'
-              ? 'Sign in to manage your portfolio'
-              : 'Join the team and showcase your skills'}
+            {mode === 'login' ? 'Sign in to manage your portfolio' : 'Join the team and showcase your skills'}
           </p>
         </div>
-        {status.message && (
-          <div className={`p-3 rounded-xl text-sm text-center mb-5 ${statusClass}`}>
+        {status.message && <div className={`p-3 rounded-xl text-sm text-center mb-5 ${statusClass}`}>
             {status.message}
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={handleGoogleSignIn}
-          disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 disabled:opacity-60 text-gray-800 font-semibold py-3 px-4 rounded-xl border border-gray-200 shadow-sm transition-all hover:-translate-y-0.5 mb-4"
-        >
-          {googleLoading ? (
-            <svg className="animate-spin w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24">
+          </div>}
+        <button type="button" onClick={handleGoogleSignIn} disabled={googleLoading} className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 disabled:opacity-60 text-gray-800 font-semibold py-3 px-4 rounded-xl border border-gray-200 shadow-sm transition-all hover:-translate-y-0.5 mb-4">
+          {googleLoading ? <svg className="animate-spin w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-          )}
+            </svg> : <svg viewBox="0 0 24 24" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+            </svg>}
           {googleLoading ? 'Signing in…' : 'Continue with Google'}
         </button>
         <div className="flex items-center gap-3 mb-4">
@@ -173,131 +168,77 @@ const LoginForm = ({ onLogin }) => {
           <span className="text-gray-600 text-xs">or use email</span>
           <div className="flex-1 h-px bg-gray-800" />
         </div>
-        {mode === 'login' && (
-          <form onSubmit={handleLogin} className="space-y-4">
+        {mode === 'login' && <form onSubmit={handleLogin} className="space-y-4">
             <div className="flex gap-2 flex-wrap">
-              <button type="button"
-                onClick={() => { setEmail('admin@admin.com'); setPassword('admin'); }}
-                className="text-[11px] px-3 py-1 bg-yellow-900/30 border border-yellow-800/40 rounded-full text-yellow-400 hover:bg-yellow-800/50 transition-colors"
-              >👑 Admin</button>
-              <button type="button"
-                onClick={() => {
-                  const u = getStoredUsers()[0];
-                  if (u) { setEmail(u.email); setPassword(u.password); }
-                  else displayStatus('No registered users yet. Sign up first!');
-                }}
-                className="text-[11px] px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-300 hover:bg-gray-700 transition-colors"
-              >🧑 Last Registered User</button>
+              <button type="button" onClick={() => {
+            setEmail('admin@admin.com');
+            setPassword('admin');
+          }} className="text-[11px] px-3 py-1 bg-yellow-900/30 border border-yellow-800/40 rounded-full text-yellow-400 hover:bg-yellow-800/50 transition-colors">👑 Admin</button>
+              <button type="button" onClick={() => {
+            const u = getStoredUsers()[0];
+            if (u) {
+              setEmail(u.email);
+              setPassword(u.password);
+            } else displayStatus('No registered users yet. Sign up first!');
+          }} className="text-[11px] px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-300 hover:bg-gray-700 transition-colors">🧑 Last Registered User</button>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
-              <input
-                type="email"
-                className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600"
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
+              <input type="email" className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
               <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 pr-14 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 px-4 flex items-center text-xs text-gray-400 hover:text-blue-400 uppercase tracking-wider transition-colors">
+                <input type={showPassword ? 'text' : 'password'} className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 pr-14 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-xs text-gray-400 hover:text-blue-400 uppercase tracking-wider transition-colors">
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
-            <button type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition hover:-translate-y-0.5">
+            <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition hover:-translate-y-0.5">
               Sign In
             </button>
             <p className="text-center text-sm text-gray-500">
               Don't have an account?{' '}
-              <button type="button" onClick={() => switchMode('signup')}
-                className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+              <button type="button" onClick={() => switchMode('signup')} className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
                 Sign Up
               </button>
             </p>
-          </form>
-        )}
-        {mode === 'signup' && (
-          <form onSubmit={handleSignUp} className="space-y-4">
+          </form>}
+        {mode === 'signup' && <form onSubmit={handleSignUp} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Full Name</label>
-              <input
-                type="text"
-                className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600"
-                placeholder="Jane Doe"
-                value={name}
-                onChange={e => setName(e.target.value)}
-              />
+              <input type="text" className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600" placeholder="Jane Doe" value={name} onChange={e => setName(e.target.value)} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
-              <input
-                type="email"
-                className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600"
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
+              <input type="email" className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Password <span className="text-gray-500 font-normal text-xs">(min. 6 chars)</span></label>
               <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 pr-14 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 px-4 flex items-center text-xs text-gray-400 hover:text-blue-400 uppercase tracking-wider transition-colors">
+                <input type={showPassword ? 'text' : 'password'} className="bg-gray-800 border border-gray-700 text-gray-200 w-full p-3.5 pr-14 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-xs text-gray-400 hover:text-blue-400 uppercase tracking-wider transition-colors">
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Confirm Password</label>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                className={`bg-gray-800 border text-gray-200 w-full p-3.5 rounded-xl focus:ring-1 outline-none transition-all placeholder-gray-600 ${
-                  confirmPassword && confirmPassword !== password
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-700 focus:border-blue-500 focus:ring-blue-500'
-                }`}
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-              />
-              {confirmPassword && confirmPassword !== password && (
-                <p className="text-red-400 text-xs mt-1">Passwords do not match</p>
-              )}
+              <input type={showPassword ? 'text' : 'password'} className={`bg-gray-800 border text-gray-200 w-full p-3.5 rounded-xl focus:ring-1 outline-none transition-all placeholder-gray-600 ${confirmPassword && confirmPassword !== password ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-700 focus:border-blue-500 focus:ring-blue-500'}`} placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
+              {confirmPassword && confirmPassword !== password && <p className="text-red-400 text-xs mt-1">Passwords do not match</p>}
             </div>
-            <button type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition hover:-translate-y-0.5">
+            <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition hover:-translate-y-0.5">
               Create Account
             </button>
             <p className="text-center text-sm text-gray-500">
               Already have an account?{' '}
-              <button type="button" onClick={() => switchMode('login')}
-                className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+              <button type="button" onClick={() => switchMode('login')} className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
                 Sign In
               </button>
             </p>
-          </form>
-        )}
+          </form>}
       </div>
-    </div>
-  );
+    </div>;
 };
 export default LoginForm;

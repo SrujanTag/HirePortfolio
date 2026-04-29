@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import { ArrowLeft, User, Zap, Terminal } from './icons';
 const COLORS = ['cyan', 'purple', 'emerald', 'blue', 'pink', 'orange', 'red', 'yellow'];
-const ROLES = [
-  'Full Stack Developer',
-  'Frontend Developer',
-  'Backend Engineer',
-  'UI/UX Designer',
-  'Product Manager',
-  'Data Analyst',
-  'DevOps Engineer',
-  'Mobile Developer',
-];
-const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
+const ROLES = ['Full Stack Developer', 'Frontend Developer', 'Backend Engineer', 'UI/UX Designer', 'Product Manager', 'Data Analyst', 'DevOps Engineer', 'Mobile Developer'];
+const AddProfileForm = ({
+  onAddProfile,
+  onBack,
+  currentUser
+}) => {
   const [form, setForm] = useState({
     name: currentUser?.name || '',
     role: ROLES[0],
@@ -25,7 +20,7 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
     linkedin: '',
     school: 'Indian Institute of Information Technology',
     degree: 'B.Tech Computer Science',
-    year: '2025–2029',
+    year: '2025–2029'
   });
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -38,14 +33,23 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
     return e;
   };
   const handleChange = (field, value) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }));
+    setForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    if (errors[field]) setErrors(prev => ({
+      ...prev,
+      [field]: undefined
+    }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    const splitSkills = (str) => str.split(',').map(s => s.trim()).filter(Boolean);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
+    }
+    const splitSkills = str => str.split(',').map(s => s.trim()).filter(Boolean);
     const newProfile = {
       id: Date.now(),
       name: form.name.trim(),
@@ -57,22 +61,21 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
       skills: {
         frontend: splitSkills(form.frontendSkills),
         backend: splitSkills(form.backendSkills),
-        tools: splitSkills(form.tools),
+        tools: splitSkills(form.tools)
       },
       github: form.github.trim(),
       linkedin: form.linkedin.trim(),
       education: {
         school: form.school.trim(),
         degree: form.degree.trim(),
-        year: form.year.trim(),
-      },
+        year: form.year.trim()
+      }
     };
     onAddProfile(newProfile);
     setSubmitted(true);
   };
   if (submitted) {
-    return (
-      <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center px-4">
+    return <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6 border border-emerald-500/30">
             <svg className="w-10 h-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,25 +84,16 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
           </div>
           <h2 className="text-3xl font-bold text-white mb-3">Profile Created!</h2>
           <p className="text-gray-400 mb-8">Your profile has been added to the portfolio grid.</p>
-          <button
-            onClick={onBack}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-bold hover:-translate-y-1 transition-all shadow-lg shadow-blue-500/25"
-          >
+          <button onClick={onBack} className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-bold hover:-translate-y-1 transition-all shadow-lg shadow-blue-500/25">
             View Portfolio
           </button>
         </div>
-      </div>
-    );
+      </div>;
   }
-  const inputClass = (field) =>
-    `w-full bg-[#1C1F26] border ${errors[field] ? 'border-red-500' : 'border-[#2F333A]'} text-gray-200 p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600 text-sm`;
-  return (
-    <div className="min-h-screen bg-[#0B0E14] text-gray-300 pb-20">
+  const inputClass = field => `w-full bg-[#1C1F26] border ${errors[field] ? 'border-red-500' : 'border-[#2F333A]'} text-gray-200 p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-600 text-sm`;
+  return <div className="min-h-screen bg-[#0B0E14] text-gray-300 pb-20">
       <div className="max-w-3xl mx-auto px-4 py-6">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors bg-[#1C1F26] px-4 py-2 rounded-full text-sm font-medium border border-[#2F333A] mb-8"
-        >
+        <button onClick={onBack} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors bg-[#1C1F26] px-4 py-2 rounded-full text-sm font-medium border border-[#2F333A] mb-8">
           <ArrowLeft size={16} /> Back to Portfolio
         </button>
         <div className="text-center mb-12 relative">
@@ -144,27 +138,13 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">Profile Color</label>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {COLORS.map(c => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => handleChange('color', c)}
-                      title={c}
-                      className={`w-8 h-8 rounded-full border-2 transition-all ${form.color === c ? 'border-white scale-110' : 'border-transparent'} bg-${c}-500`}
-                    />
-                  ))}
+                  {COLORS.map(c => <button key={c} type="button" onClick={() => handleChange('color', c)} title={c} className={`w-8 h-8 rounded-full border-2 transition-all ${form.color === c ? 'border-white scale-110' : 'border-transparent'} bg-${c}-500`} />)}
                 </div>
               </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5">Bio * <span className="text-gray-600">(2-3 sentences)</span></label>
-              <textarea
-                rows={3}
-                className={inputClass('bio')}
-                placeholder="Describe yourself, your passion, and what you bring to the table..."
-                value={form.bio}
-                onChange={e => handleChange('bio', e.target.value)}
-              />
+              <textarea rows={3} className={inputClass('bio')} placeholder="Describe yourself, your passion, and what you bring to the table..." value={form.bio} onChange={e => handleChange('bio', e.target.value)} />
               {errors.bio && <p className="text-red-400 text-xs mt-1">{errors.bio}</p>}
             </div>
           </div>
@@ -222,23 +202,15 @@ const AddProfileForm = ({ onAddProfile, onBack, currentUser }) => {
             </div>
           </div>
           <div className="flex gap-4">
-            <button
-              type="submit"
-              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all text-base"
-            >
+            <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all text-base">
               🚀 Add to Portfolio
             </button>
-            <button
-              type="button"
-              onClick={onBack}
-              className="px-6 py-4 rounded-xl border border-[#2F333A] text-gray-400 hover:text-white hover:border-gray-600 transition-all font-medium"
-            >
+            <button type="button" onClick={onBack} className="px-6 py-4 rounded-xl border border-[#2F333A] text-gray-400 hover:text-white hover:border-gray-600 transition-all font-medium">
               Cancel
             </button>
           </div>
         </form>
       </div>
-    </div>
-  );
+    </div>;
 };
 export default AddProfileForm;

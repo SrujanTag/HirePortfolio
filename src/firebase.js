@@ -10,12 +10,11 @@ const firebaseConfig = {
   measurementId: "G-832C3ZETJX"
 };
 export const isFirebaseConfigured = !firebaseConfig.apiKey.startsWith('YOUR_');
-const app      = initializeApp(firebaseConfig);
-const auth     = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt: 'select_account' });
-export const ADMIN_EMAILS = [
-  'admin@admin.com',             
-  'srujantagalpallewa@gmail.com',
-];
+provider.setCustomParameters({
+  prompt: 'select_account'
+});
+export const ADMIN_EMAILS = ['admin@admin.com', 'srujantagalpallewa@gmail.com'];
 export { auth, provider, signInWithPopup, signOut };
