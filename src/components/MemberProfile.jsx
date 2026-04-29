@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { getDetailedData } from '../data/constants';
 import { ArrowLeft, User, Zap, Layout, Database, Terminal, Layers, ExternalLink, Briefcase, Github, Linkedin, Mail, BookOpen, Globe, Trophy, Star, CheckCircle } from './icons';
+import ShareModal from './ShareModal';
 
 function MemberProfile({ baseMember, onHire, onBack }) {
   const member = getDetailedData(baseMember);
+  const [showShare, setShowShare] = useState(false);
   
   const colors = {
     cyan: "text-cyan-400",
@@ -53,19 +55,28 @@ function MemberProfile({ baseMember, onHire, onBack }) {
               ))}
            </div>
 
-           <div className="flex items-center justify-center gap-4">
-              <button 
+           <div className="flex items-center justify-center gap-4 flex-wrap">
+              <button
                 onClick={() => onHire(member)}
                 className={`bg-gradient-to-r from-${member.color}-600 to-${member.color}-500 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-${member.color}-500/25 hover:shadow-${member.color}-500/40 hover:-translate-y-1 transition-all flex items-center gap-2`}
               >
                 <Briefcase size={18} /> Hire Me
               </button>
+              {/* Share button */}
+              <button
+                onClick={() => setShowShare(true)}
+                className="px-5 py-3 rounded-full bg-[#1C1F26] border border-[#2F333A] text-gray-300 hover:text-white hover:border-gray-500 transition-all font-semibold text-sm flex items-center gap-2"
+              >
+                🔗 Share Profile
+              </button>
               <div className="flex gap-2">
                 <a href="https://github.com" target="_blank" rel="noopener noreferrer"><button className="p-3 rounded-full bg-[#1C1F26] hover:bg-gray-700 text-gray-400 hover:text-white transition-colors border border-[#2F333A]"><Github size={20}/></button></a>
                 <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><button className="p-3 rounded-full bg-[#1C1F26] hover:bg-gray-700 text-gray-400 hover:text-white transition-colors border border-[#2F333A]"><Linkedin size={20}/></button></a>
-                <a href="https://gmail.com" target="_blank" rel="noopener noreferrer"><button className="p-3 rounded-full bg-[#1C1F26] hover:bg-gray-700 text-gray-400 hover:text-white transition-colors border border-[#2F333A]"><Mail size={20}/></button></a>
+                <a href={`mailto:${member.email}`}><button className="p-3 rounded-full bg-[#1C1F26] hover:bg-gray-700 text-gray-400 hover:text-white transition-colors border border-[#2F333A]"><Mail size={20}/></button></a>
               </div>
            </div>
+           {/* Share Modal */}
+           {showShare && <ShareModal member={member} onClose={() => setShowShare(false)} />}
         </div>
       </div>
 
